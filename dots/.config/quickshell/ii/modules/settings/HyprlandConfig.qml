@@ -597,6 +597,27 @@ ContentPage {
         }
     }
 
+    // Binds
+    ContentSection {
+        icon: "keyboard_command_key"
+        title: Translation.tr("Binds")
+
+        ContentSubsection {
+            title: Translation.tr("Keybinds")
+            tooltip: Translation.tr("One per line, e.g. bind = SUPER, Q, exec, kitty")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.Wrap
+                onEditingFinished: {
+                    const lines = text.split("\\n").map(l => l.trim()).filter(l => l.length > 0)
+                    const bindLines = lines.map(l => l.toLowerCase().startsWith("bind") ? l : `bind = ${l}`)
+                    HyprlandConfig.setMany({}, { removeMatching: ["^\\\\s*bind\\\\s*="], addLines: bindLines })
+                }
+            }
+        }
+    }
+
     // 3d Misc
     HyprlandConfigOption { id: vfrOpt; key: "misc:vfr" }
     HyprlandConfigOption { id: vrrOpt; key: "misc:vrr" }
