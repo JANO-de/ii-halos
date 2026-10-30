@@ -618,6 +618,27 @@ ContentPage {
         }
     }
 
+    // Rules
+    ContentSection {
+        icon: "filter_alt"
+        title: Translation.tr("Rules")
+
+        ContentSubsection {
+            title: Translation.tr("Window rules")
+            tooltip: Translation.tr("One per line, e.g. windowrule = float, class:^(kitty)$")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.Wrap
+                onEditingFinished: {
+                    const lines = text.split("\\n").map(l => l.trim()).filter(l => l.length > 0)
+                    const ruleLines = lines.map(l => l.toLowerCase().startsWith("windowrule") ? l : `windowrule = ${l}`)
+                    HyprlandConfig.setMany({}, { removeMatching: ["^\\\\s*windowrule\\\\s*="], addLines: ruleLines })
+                }
+            }
+        }
+    }
+
     // 3d Misc
     HyprlandConfigOption { id: vfrOpt; key: "misc:vfr" }
     HyprlandConfigOption { id: vrrOpt; key: "misc:vrr" }
