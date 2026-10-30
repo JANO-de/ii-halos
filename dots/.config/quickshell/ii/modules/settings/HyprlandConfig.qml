@@ -389,6 +389,109 @@ ContentPage {
         }
     }
 
+    // Input advanced
+    HyprlandConfigOption { id: repeatDelayOpt; key: "input:repeat_delay" }
+    HyprlandConfigOption { id: repeatRateOpt; key: "input:repeat_rate" }
+    HyprlandConfigOption { id: sensitivityOpt; key: "input:sensitivity" }
+    HyprlandConfigOption { id: followMouseOpt; key: "input:follow_mouse" }
+    HyprlandConfigOption { id: leftHandedOpt; key: "input:left_handed" }
+    HyprlandConfigOption { id: accelProfileOpt; key: "input:accel_profile" }
+
+    ContentSection {
+        icon: "keyboard"
+        title: Translation.tr("Keyboard repeat")
+
+        ConfigSpinBox {
+            icon: "timer"
+            text: Translation.tr("Repeat delay")
+            tooltip: Translation.tr("Delay before a key starts repeating (ms)")
+            from: 100
+            to: 1500
+            stepSize: 25
+            value: repeatDelayOpt.value ?? 600
+            onValueChanged: {
+                if (repeatDelayOpt.value === undefined) return
+                if (value === repeatDelayOpt.value) return
+                repeatDelayOpt.setValue(value)
+            }
+        }
+        ConfigSpinBox {
+            icon: "speed"
+            text: Translation.tr("Repeat rate")
+            tooltip: Translation.tr("Key repeats per second")
+            from: 1
+            to: 80
+            stepSize: 1
+            value: repeatRateOpt.value ?? 25
+            onValueChanged: {
+                if (repeatRateOpt.value === undefined) return
+                if (value === repeatRateOpt.value) return
+                repeatRateOpt.setValue(value)
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "mouse"
+        title: Translation.tr("Mouse")
+
+        ConfigSlider {
+            buttonIcon: "mouse"
+            text: Translation.tr("Sensitivity")
+            from: -1
+            to: 1
+            value: sensitivityOpt.value ?? 0
+            onValueChanged: {
+                if (sensitivityOpt.value === undefined) return
+                if (value === sensitivityOpt.value) return
+                sensitivityOpt.setValue(value)
+            }
+        }
+        ConfigSpinBox {
+            icon: "visibility"
+            text: Translation.tr("Follow mouse")
+            tooltip: Translation.tr("Focus follows mouse (0-3)")
+            from: 0
+            to: 3
+            stepSize: 1
+            value: followMouseOpt.value ?? 1
+            onValueChanged: {
+                if (followMouseOpt.value === undefined) return
+                if (value === followMouseOpt.value) return
+                followMouseOpt.setValue(value)
+            }
+        }
+        ConfigSwitch {
+            buttonIcon: "swap_horiz"
+            text: Translation.tr("Left-handed")
+            checked: (leftHandedOpt.value ?? 0) != 0 && leftHandedOpt.value !== false
+            onCheckedChanged: {
+                if (leftHandedOpt.value === undefined) return
+                const current = (leftHandedOpt.value != 0 && leftHandedOpt.value !== false)
+                if (checked === current) return
+                leftHandedOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Swap left and right mouse buttons")
+            }
+        }
+        ContentSubsection {
+            title: Translation.tr("Accel profile")
+            tooltip: Translation.tr("flat or adaptive")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.NoWrap
+                text: accelProfileOpt.value !== undefined ? String(accelProfileOpt.value) : ""
+                onEditingFinished: {
+                    if (accelProfileOpt.value === undefined) return
+                    if (text === String(accelProfileOpt.value)) return
+                    accelProfileOpt.setValue(text)
+                }
+            }
+        }
+    }
+
     // 3d Misc
     HyprlandConfigOption { id: vfrOpt; key: "misc:vfr" }
     HyprlandConfigOption { id: vrrOpt; key: "misc:vrr" }
