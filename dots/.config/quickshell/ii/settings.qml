@@ -83,6 +83,11 @@ ApplicationWindow {
             component: "modules/settings/ProfilesConfig.qml"
         },
         {
+            name: Translation.tr("Displays"),
+            icon: "monitor",
+            component: "modules/settings/DisplaysConfig.qml"
+        },
+        {
             name: Translation.tr("About"),
             icon: "info",
             component: "modules/settings/About.qml"
