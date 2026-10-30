@@ -576,6 +576,27 @@ ContentPage {
         }
     }
 
+    // Environment
+    ContentSection {
+        icon: "terminal"
+        title: Translation.tr("Environment")
+
+        ContentSubsection {
+            title: Translation.tr("Environment variables")
+            tooltip: Translation.tr("One per line, e.g. env = XCURSOR_SIZE,24")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.Wrap
+                onEditingFinished: {
+                    const lines = text.split("\\n").map(l => l.trim()).filter(l => l.length > 0)
+                    const envLines = lines.map(l => l.toLowerCase().startsWith("env") ? l : `env = ${l}`)
+                    HyprlandConfig.setMany({}, { removeMatching: ["^\\\\s*env\\\\s*="], addLines: envLines })
+                }
+            }
+        }
+    }
+
     // 3d Misc
     HyprlandConfigOption { id: vfrOpt; key: "misc:vfr" }
     HyprlandConfigOption { id: vrrOpt; key: "misc:vrr" }
