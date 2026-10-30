@@ -79,8 +79,103 @@ ContentPage {
         }
     }
 
+    // General
+    HyprlandConfigOption { id: allowTearingOpt; key: "general:allow_tearing" }
+    HyprlandConfigOption { id: layoutOpt; key: "general:layout" }
+    HyprlandConfigOption { id: snapEnabledOpt; key: "general:snap:enabled" }
+    HyprlandConfigOption { id: activeBorderOpt; key: "general:col.active_border" }
+    HyprlandConfigOption { id: inactiveBorderOpt; key: "general:col.inactive_border" }
+
+    ContentSection {
+        icon: "tune"
+        title: Translation.tr("General")
+
+        ConfigSwitch {
+            buttonIcon: "water_drop"
+            text: Translation.tr("Allow tearing")
+            checked: (allowTearingOpt.value ?? 0) != 0 && allowTearingOpt.value !== false
+            onCheckedChanged: {
+                if (allowTearingOpt.value === undefined) return
+                const current = (allowTearingOpt.value != 0 && allowTearingOpt.value !== false)
+                if (checked === current) return
+                allowTearingOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Allow screen tearing for lower latency")
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "grid_view"
+            text: Translation.tr("Snap enabled")
+            checked: (snapEnabledOpt.value ?? 0) != 0 && snapEnabledOpt.value !== false
+            onCheckedChanged: {
+                if (snapEnabledOpt.value === undefined) return
+                const current = (snapEnabledOpt.value != 0 && snapEnabledOpt.value !== false)
+                if (checked === current) return
+                snapEnabledOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Snap windows to edges and each other")
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Layout")
+            tooltip: Translation.tr("Window layout algorithm")
+
+            ConfigSelectionArray {
+                options: [
+                    { "displayName": Translation.tr("Dwindle"), "value": "dwindle" },
+                    { "displayName": Translation.tr("Master"), "value": "master" },
+                    { "displayName": Translation.tr("Scrolling"), "value": "scrolling" }
+                ]
+                currentValue: layoutOpt.value !== undefined ? String(layoutOpt.value) : "dwindle"
+                onSelected: (newValue) => {
+                    if (layoutOpt.value === undefined) return
+                    if (String(newValue) === String(layoutOpt.value)) return
+                    layoutOpt.setValue(newValue)
+                }
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Active border color")
+            tooltip: Translation.tr("Hyprland color string, e.g. rgba(33ccffee)")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.NoWrap
+                text: activeBorderOpt.value !== undefined ? String(activeBorderOpt.value) : ""
+                onEditingFinished: {
+                    if (activeBorderOpt.value === undefined) return
+                    if (text === String(activeBorderOpt.value)) return
+                    activeBorderOpt.setValue(text)
+                }
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Inactive border color")
+            tooltip: Translation.tr("Hyprland color string, e.g. rgba(595959aa)")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.NoWrap
+                text: inactiveBorderOpt.value !== undefined ? String(inactiveBorderOpt.value) : ""
+                onEditingFinished: {
+                    if (inactiveBorderOpt.value === undefined) return
+                    if (text === String(inactiveBorderOpt.value)) return
+                    inactiveBorderOpt.setValue(text)
+                }
+            }
+        }
+    }
+
     // 3b Blur, animations
     HyprlandConfigOption { id: blurEnabledOpt; key: "decoration:blur:enabled" }
+    HyprlandConfigOption { id: blurSizeOpt; key: "decoration:blur:size" }
+    HyprlandConfigOption { id: blurPassesOpt; key: "decoration:blur:passes" }
     HyprlandConfigOption { id: animationsEnabledOpt; key: "animations:enabled" }
 
     ContentSection {
@@ -101,6 +196,34 @@ ContentPage {
                 text: Translation.tr("Enable blur for transparent windows")
             }
         }
+        ConfigSpinBox {
+            icon: "blur_on"
+            text: Translation.tr("Blur size")
+            tooltip: Translation.tr("Blur radius")
+            from: 1
+            to: 20
+            stepSize: 1
+            value: blurSizeOpt.value ?? 8
+            onValueChanged: {
+                if (blurSizeOpt.value === undefined) return
+                if (value === blurSizeOpt.value) return
+                blurSizeOpt.setValue(value)
+            }
+        }
+        ConfigSpinBox {
+            icon: "layers"
+            text: Translation.tr("Blur passes")
+            tooltip: Translation.tr("Number of blur passes")
+            from: 1
+            to: 5
+            stepSize: 1
+            value: blurPassesOpt.value ?? 1
+            onValueChanged: {
+                if (blurPassesOpt.value === undefined) return
+                if (value === blurPassesOpt.value) return
+                blurPassesOpt.setValue(value)
+            }
+        }
         ConfigSwitch {
             buttonIcon: "animation"
             text: Translation.tr("Animations")
@@ -113,6 +236,115 @@ ContentPage {
             }
             StyledToolTip {
                 text: Translation.tr("Enable window and layer animations")
+            }
+        }
+    }
+
+    // Decoration (shadow, opacity, dim)
+    HyprlandConfigOption { id: shadowEnabledOpt; key: "decoration:shadow:enabled" }
+    HyprlandConfigOption { id: shadowRangeOpt; key: "decoration:shadow:range" }
+    HyprlandConfigOption { id: shadowRenderPowerOpt; key: "decoration:shadow:render_power" }
+    HyprlandConfigOption { id: activeOpacityOpt; key: "decoration:active_opacity" }
+    HyprlandConfigOption { id: inactiveOpacityOpt; key: "decoration:inactive_opacity" }
+    HyprlandConfigOption { id: dimInactiveOpt; key: "decoration:dim_inactive" }
+    HyprlandConfigOption { id: dimStrengthOpt; key: "decoration:dim_strength" }
+
+    ContentSection {
+        icon: "shadow"
+        title: Translation.tr("Decoration")
+
+        ConfigSwitch {
+            buttonIcon: "shadow"
+            text: Translation.tr("Shadows")
+            checked: (shadowEnabledOpt.value ?? 0) != 0 && shadowEnabledOpt.value !== false
+            onCheckedChanged: {
+                if (shadowEnabledOpt.value === undefined) return
+                const current = (shadowEnabledOpt.value != 0 && shadowEnabledOpt.value !== false)
+                if (checked === current) return
+                shadowEnabledOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Enable drop shadows for windows")
+            }
+        }
+        ConfigSpinBox {
+            icon: "shadow"
+            text: Translation.tr("Shadow range")
+            tooltip: Translation.tr("Shadow size")
+            from: 0
+            to: 100
+            stepSize: 1
+            value: shadowRangeOpt.value ?? 4
+            onValueChanged: {
+                if (shadowRangeOpt.value === undefined) return
+                if (value === shadowRangeOpt.value) return
+                shadowRangeOpt.setValue(value)
+            }
+        }
+        ConfigSpinBox {
+            icon: "gradient"
+            text: Translation.tr("Shadow render power")
+            tooltip: Translation.tr("Shadow falloff")
+            from: 1
+            to: 4
+            stepSize: 1
+            value: shadowRenderPowerOpt.value ?? 3
+            onValueChanged: {
+                if (shadowRenderPowerOpt.value === undefined) return
+                if (value === shadowRenderPowerOpt.value) return
+                shadowRenderPowerOpt.setValue(value)
+            }
+        }
+
+        ConfigSlider {
+            buttonIcon: "opacity"
+            text: Translation.tr("Active opacity")
+            from: 0
+            to: 1
+            value: activeOpacityOpt.value ?? 1.0
+            onValueChanged: {
+                if (activeOpacityOpt.value === undefined) return
+                if (value === activeOpacityOpt.value) return
+                activeOpacityOpt.setValue(value)
+            }
+        }
+        ConfigSlider {
+            buttonIcon: "opacity"
+            text: Translation.tr("Inactive opacity")
+            from: 0
+            to: 1
+            value: inactiveOpacityOpt.value ?? 1.0
+            onValueChanged: {
+                if (inactiveOpacityOpt.value === undefined) return
+                if (value === inactiveOpacityOpt.value) return
+                inactiveOpacityOpt.setValue(value)
+            }
+        }
+
+        ConfigSwitch {
+            buttonIcon: "contrast"
+            text: Translation.tr("Dim inactive")
+            checked: (dimInactiveOpt.value ?? 0) != 0 && dimInactiveOpt.value !== false
+            onCheckedChanged: {
+                if (dimInactiveOpt.value === undefined) return
+                const current = (dimInactiveOpt.value != 0 && dimInactiveOpt.value !== false)
+                if (checked === current) return
+                dimInactiveOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Dim inactive windows")
+            }
+        }
+        ConfigSlider {
+            buttonIcon: "contrast"
+            text: Translation.tr("Dim strength")
+            from: 0
+            to: 1
+            value: dimStrengthOpt.value ?? 0.0
+            onValueChanged: {
+                if (dimStrengthOpt.value === undefined) return
+                if (value === dimStrengthOpt.value) return
+                dimStrengthOpt.setValue(value)
             }
         }
     }
