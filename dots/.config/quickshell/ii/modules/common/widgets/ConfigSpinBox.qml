@@ -8,6 +8,7 @@ Item {
     id: root
     property string text: ""
     property string icon
+    property string tooltip: ""
     property alias value: spinBoxWidget.value
     property alias stepSize: spinBoxWidget.stepSize
     property alias from: spinBoxWidget.from
@@ -56,5 +57,18 @@ Item {
             Layout.fillWidth: false
             value: root.value
         }
+    }
+
+    MouseArea {
+        id: spinBoxTooltipArea
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.NoButton
+    }
+
+    StyledToolTip {
+        text: root.tooltip
+        alternativeVisibleCondition: spinBoxTooltipArea.containsMouse
+        extraVisibleCondition: false
     }
 }

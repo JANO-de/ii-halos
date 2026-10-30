@@ -337,21 +337,29 @@ ApplicationWindow {
                         }
                     }
 
-                    NavigationRailTabArray {
-                        currentIndex: root.currentPage
-                        expanded: navRail.expanded
-                        Repeater {
-                            model: root.pages
-                            NavigationRailButton {
-                                required property var index
-                                required property var modelData
-                                toggled: root.currentPage === index
-                                onPressed: root.currentPage = index;
-                                expanded: navRail.expanded
-                                buttonIcon: modelData.icon
-                                buttonIconRotation: modelData.iconRotation || 0
-                                buttonText: modelData.name
-                                showToggledHighlight: false
+                    ScrollView {
+                        id: navTabsScroll
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        clip: true
+                        contentWidth: availableWidth
+
+                        NavigationRailTabArray {
+                            currentIndex: root.currentPage
+                            expanded: navRail.expanded
+                            Repeater {
+                                model: root.pages
+                                NavigationRailButton {
+                                    required property var index
+                                    required property var modelData
+                                    toggled: root.currentPage === index
+                                    onPressed: root.currentPage = index;
+                                    expanded: navRail.expanded
+                                    buttonIcon: modelData.icon
+                                    buttonIconRotation: modelData.iconRotation || 0
+                                    buttonText: modelData.name
+                                    showToggledHighlight: false
+                                }
                             }
                         }
                     }

@@ -25,6 +25,15 @@ Singleton {
         args += root._extraArgs(extras)
         root._queueShellOverridesCommand(`${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args}`);
     }
+    function reset(key: string) {
+        root._queueShellOverridesCommand(`${root.configuratorScriptPath} --file ${root.shellOverridesPath} --reset "${key}"`);
+    }
+    function resetMany(keys: list<string>, extras: var) {
+        let args = ""
+        for (let i = 0; i < keys.length; i++) args += `--reset "${keys[i]}" `
+        args += root._extraArgs(extras)
+        root._queueShellOverridesCommand(`${root.configuratorScriptPath} --file ${root.shellOverridesPath} ${args}`);
+    }
     function _queueShellOverridesCommand(command: string) {
         root._queueConfigWrite({
             kind: "shellOverrides",
