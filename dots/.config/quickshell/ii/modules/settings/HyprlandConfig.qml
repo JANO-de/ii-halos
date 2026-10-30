@@ -492,6 +492,90 @@ ContentPage {
         }
     }
 
+    // Layout
+    HyprlandConfigOption { id: preserveSplitOpt; key: "dwindle:preserve_split" }
+    HyprlandConfigOption { id: smartSplitOpt; key: "dwindle:smart_split" }
+    HyprlandConfigOption { id: forceSplitOpt; key: "dwindle:force_split" }
+    HyprlandConfigOption { id: pseudoTileOpt; key: "dwindle:pseudotile" }
+    HyprlandConfigOption { id: masterOrientationOpt; key: "master:orientation" }
+
+    ContentSection {
+        icon: "dashboard"
+        title: Translation.tr("Layout")
+
+        ConfigSwitch {
+            buttonIcon: "splitscreen"
+            text: Translation.tr("Preserve split")
+            checked: (preserveSplitOpt.value ?? 0) != 0 && preserveSplitOpt.value !== false
+            onCheckedChanged: {
+                if (preserveSplitOpt.value === undefined) return
+                const current = (preserveSplitOpt.value != 0 && preserveSplitOpt.value !== false)
+                if (checked === current) return
+                preserveSplitOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Preserve split direction when moving windows")
+            }
+        }
+        ConfigSwitch {
+            buttonIcon: "auto_awesome"
+            text: Translation.tr("Smart split")
+            checked: (smartSplitOpt.value ?? 0) != 0 && smartSplitOpt.value !== false
+            onCheckedChanged: {
+                if (smartSplitOpt.value === undefined) return
+                const current = (smartSplitOpt.value != 0 && smartSplitOpt.value !== false)
+                if (checked === current) return
+                smartSplitOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Split follows mouse cursor")
+            }
+        }
+        ConfigSwitch {
+            buttonIcon: "picture_in_picture"
+            text: Translation.tr("Pseudotile")
+            checked: (pseudoTileOpt.value ?? 0) != 0 && pseudoTileOpt.value !== false
+            onCheckedChanged: {
+                if (pseudoTileOpt.value === undefined) return
+                const current = (pseudoTileOpt.value != 0 && pseudoTileOpt.value !== false)
+                if (checked === current) return
+                pseudoTileOpt.setValue(checked)
+            }
+            StyledToolTip {
+                text: Translation.tr("Pseudotile floating windows into tiled")
+            }
+        }
+        ConfigSpinBox {
+            icon: "splitscreen"
+            text: Translation.tr("Force split")
+            tooltip: Translation.tr("0=follow mouse, 1=left, 2=right")
+            from: 0
+            to: 2
+            stepSize: 1
+            value: forceSplitOpt.value ?? 0
+            onValueChanged: {
+                if (forceSplitOpt.value === undefined) return
+                if (value === forceSplitOpt.value) return
+                forceSplitOpt.setValue(value)
+            }
+        }
+        ContentSubsection {
+            title: Translation.tr("Master orientation")
+            tooltip: Translation.tr("left, right, top, bottom, center")
+
+            MaterialTextArea {
+                Layout.fillWidth: true
+                wrapMode: TextEdit.NoWrap
+                text: masterOrientationOpt.value !== undefined ? String(masterOrientationOpt.value) : ""
+                onEditingFinished: {
+                    if (masterOrientationOpt.value === undefined) return
+                    if (text === String(masterOrientationOpt.value)) return
+                    masterOrientationOpt.setValue(text)
+                }
+            }
+        }
+    }
+
     // 3d Misc
     HyprlandConfigOption { id: vfrOpt; key: "misc:vfr" }
     HyprlandConfigOption { id: vrrOpt; key: "misc:vrr" }
