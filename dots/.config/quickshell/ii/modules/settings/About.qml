@@ -7,7 +7,7 @@ import qs.modules.common
 import qs.modules.common.widgets
 
 ContentPage {
-    readonly property int index: 9
+    readonly property int index: 11
     forceWidth: true
 
     ContentSection {
