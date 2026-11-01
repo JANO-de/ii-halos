@@ -155,6 +155,8 @@ Variants {
         }
 
         property bool mediaModeOpen: mediaModeLoader.active && MprisController.activePlayer
+        property bool contextMenuOpen: false
+        property point contextMenuPos: Qt.point(0, 0)
         onMediaModeOpenChanged: {
             if (!mediaModeOpen && Config.options.appearance.palette.type.startsWith("scheme")) {
                 Wallpapers.apply(Config.options.background.wallpaperPath)
@@ -524,6 +526,24 @@ Variants {
             Behavior on opacity {
                 animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
             }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.RightButton
+            z: 999
+            onPressed: (mouse) => {
+                bgRoot.contextMenuPos = Qt.point(mouse.x, mouse.y);
+                bgRoot.contextMenuOpen = true;
+                mouse.accepted = true;
+            }
+        }
+
+        ContextMenu {
+            shown: bgRoot.contextMenuOpen
+            menuX: bgRoot.contextMenuPos.x
+            menuY: bgRoot.contextMenuPos.y
+            onClosed: bgRoot.contextMenuOpen = false
         }
     }
 }
