@@ -201,7 +201,7 @@ Singleton {
         }
         creationTimesProc.command = [
             "bash", "-c",
-            "for path do stat -c '%W' -- \\"$path\\" 2>/dev/null || printf '0\\\\n'; done",
+            "for path do stat -c '%W' -- \"$path\" 2>/dev/null || printf '0\\n'; done",
             "wallpaper-birth-times"
         ].concat(paths);
         creationTimesProc.running = true;
