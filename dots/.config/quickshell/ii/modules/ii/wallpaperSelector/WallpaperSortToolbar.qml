@@ -44,7 +44,7 @@ Toolbar {
         colBackgroundActive: Appearance.colors.colLayer2Active
         colBackgroundToggled: Appearance.colors.colPrimary
         colBackgroundToggledHover: Appearance.colors.colPrimaryHover
-        colBackgroundToggledActive: Appearance.colors.colPrimaryActive
+        // colBackgroundToggledActive: Appearance.colors.colPrimaryActive (unsupported by RippleButton)
         colText: toggled ? Appearance.colors.colOnPrimary : Appearance.colors.colOnLayer2
         colRipple: Appearance.colors.colLayer2Active
         colRippleToggled: Appearance.colors.colPrimaryActive
@@ -223,7 +223,7 @@ Toolbar {
                     colBackgroundActive: Appearance.colors.colLayer2Active
                     colBackgroundToggled: Appearance.colors.colPrimary
                     colBackgroundToggledHover: Appearance.colors.colPrimaryHover
-                    colBackgroundToggledActive: Appearance.colors.colPrimaryActive
+        // colBackgroundToggledActive: Appearance.colors.colPrimaryActive (unsupported by RippleButton)
                     colRipple: Appearance.colors.colLayer2Active
                     colRippleToggled: Appearance.colors.colPrimaryActive
 
