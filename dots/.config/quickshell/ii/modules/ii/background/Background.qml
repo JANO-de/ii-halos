@@ -554,8 +554,8 @@ Variants {
         }
 
         ContextMenu {
-            width: bgRoot.screen ? bgRoot.screen.width : 1920
-            height: bgRoot.screen ? bgRoot.screen.height : 1080
+            screenWidth: bgRoot.screen ? bgRoot.screen.width : 1920
+            screenHeight: bgRoot.screen ? bgRoot.screen.height : 1080
             shown: bgRoot.contextMenuOpen
             menuX: bgRoot.contextMenuPos.x
             menuY: bgRoot.contextMenuPos.y

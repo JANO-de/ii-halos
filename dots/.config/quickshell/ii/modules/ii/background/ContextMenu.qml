@@ -7,10 +7,12 @@ import qs.modules.common.widgets
 import Quickshell
 
 Item {
-    id: root
-    width: parent ? parent.width : 0
-    height: parent ? parent.height : 0
-    visible: root.shown
+    id: ctxRoot
+    property int screenWidth: 1920
+    property int screenHeight: 1080
+    width: screenWidth
+    height: screenHeight
+    visible: ctxRoot.shown
 
     property bool shown: false
     property real menuX: 0
@@ -20,22 +22,22 @@ Item {
     signal closed()
 
     function close() {
-        console.log("[ctx] close, shown was", root.shown);
-        root.shown = false;
-        root.moreExpanded = false;
-        root.closed();
+        console.log("[ctx] close, shown was", ctxRoot.shown);
+        ctxRoot.shown = false;
+        ctxRoot.moreExpanded = false;
+        ctxRoot.closed();
     }
 
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.AllButtons
-        onPressed: root.close()
+        onPressed: ctxRoot.close()
     }
 
     Rectangle {
         id: menu
-        x: Math.min(root.menuX, root.width - width - 8)
-        y: Math.min(root.menuY, root.height - height - 8)
+        x: Math.min(ctxRoot.menuX, ctxRoot.width - width - 8)
+        y: Math.min(ctxRoot.menuY, ctxRoot.height - height - 8)
         width: 230
         implicitHeight: menuColumn.implicitHeight + 16
         color: Appearance.colors.colLayer0
@@ -85,7 +87,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         entry.triggered();
-                        root.close();
+                        ctxRoot.close();
                     }
                 }
             }
@@ -113,15 +115,15 @@ Item {
             }
 
             Entry {
-                icon: root.moreExpanded ? "expand_less" : "expand_more"
+                icon: ctxRoot.moreExpanded ? "expand_less" : "expand_more"
                 label: Translation.tr("More tools")
-                onTriggered: root.moreExpanded = !root.moreExpanded
+                onTriggered: ctxRoot.moreExpanded = !ctxRoot.moreExpanded
             }
 
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 2
-                visible: root.moreExpanded
+                visible: ctxRoot.moreExpanded
 
                 Entry {
                     icon: "terminal"
