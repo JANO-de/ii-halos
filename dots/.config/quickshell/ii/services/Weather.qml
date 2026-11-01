@@ -186,18 +186,18 @@ Singleton {
     //                 root.gpsActive = root.location.valid ? true : false;
     //                 console.error("[WeatherService] Failed to get the GPS location.");
     //             }
-        }
+    //         }
 
-        onValidityChanged: {
-            if (!positionSource.valid) {
-                positionSource.stop();
-                root.location.valid = false;
-                root.gpsActive = false;
-                Quickshell.execDetached(["notify-send", Translation.tr("Weather Service"), Translation.tr("Cannot find a GPS service. Using the fallback method instead."), "-a", "Shell"]);
-                console.error("[WeatherService] Could not aquire a valid backend plugin.");
-            }
-        }
-    }
+        // onValidityChanged: {
+        //     if (!positionSource.valid) {
+        //         positionSource.stop();
+        //         root.location.valid = false;
+        //         root.gpsActive = false;
+        //         Quickshell.execDetached(["notify-send", Translation.tr("Weather Service"), Translation.tr("Cannot find a GPS service. Using the fallback method instead."), "-a", "Shell"]);
+        //         console.error("[WeatherService] Could not aquire a valid backend plugin.");
+        //     }
+        // }
+    // }
 
     Timer {
         running: !root.gpsActive
