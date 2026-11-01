@@ -44,6 +44,11 @@ Singleton {
         obj[keys[keys.length - 1]] = convertedValue;
     }
 
+    function saveOptionsNow() {
+        if (!root.ready) return;
+        configFileView.writeAdapter();
+    }
+
     Timer {
         id: fileReloadTimer
         interval: root.readWriteDelay
@@ -273,6 +278,10 @@ Singleton {
                 property string transitionType: "radial"
                 property int wipeAngle: 0
                 property string wallpaperPath: ""
+                property string lockscreenWallpaperPath: ""
+                property string lightModeWallpaperPath: ""
+                property bool useWallpaperEngine: false
+                property string wallpaperEngineId: ""
                 property string thumbnailPath: ""
                 property bool hideWhenFullscreen: true
                 property JsonObject parallax: JsonObject {
@@ -850,6 +859,10 @@ Singleton {
                         "path": `${Directories.pictures}/Wallpapers`
                     }
                 ]
+                property bool useCustomDefaultPath: false
+                property string customDefaultPath: FileUtils.trimFileProtocol(`${Directories.pictures}/Wallpapers`)
+                property string sortField: "modified"
+                property bool sortReversed: false
             }
 
             property JsonObject windows: JsonObject {

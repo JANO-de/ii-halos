@@ -583,7 +583,7 @@ MouseArea {
                             }
                         }
 
-                        model: wallpaperSelectorContent.browserMode ? wallpaperSelectorContent.apiImages : (wallpaperSelectorContent.favMode ? favouritesModel : (wallpaperSelectorContent.activeColorFilter ? colorFilteredModel : Wallpapers.folderModel))
+                        model: wallpaperSelectorContent.browserMode ? wallpaperSelectorContent.apiImages : (wallpaperSelectorContent.favMode ? favouritesModel : (wallpaperSelectorContent.activeColorFilter ? colorFilteredModel : Wallpapers.sortedFolderModel))
                         onModelChanged: currentIndex = 0
                         delegate: WallpaperDirectoryItem {
                             required property var modelData
@@ -643,7 +643,7 @@ MouseArea {
                         }
                     }
 
-                    ImageOptionsToolbar {
+                     ImageOptionsToolbar {
                         z: 1
                         colBackground: Appearance.colors.colPrimary
                         anchors {
@@ -651,6 +651,16 @@ MouseArea {
                             bottomMargin: 8
                             right: parent.right
                             rightMargin: 16
+                        }
+                    }
+
+                    WallpaperSortToolbar {
+                        z: 2
+                        anchors {
+                            bottom: parent.bottom
+                            bottomMargin: 8
+                            left: parent.left
+                            leftMargin: 16
                         }
                     }
 

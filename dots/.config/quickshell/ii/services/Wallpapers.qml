@@ -20,7 +20,12 @@ Singleton {
     property string extractColorsScriptPath: FileUtils.trimFileProtocol(Directories.extractColorsScriptPath)
     property alias directory: folderModel.folder
     readonly property string effectiveDirectory: FileUtils.trimFileProtocol(folderModel.folder.toString())
-    property url defaultFolder: Qt.resolvedUrl(`${Directories.pictures}/Wallpapers`)
+    property url defaultFolder: {
+        if (Config.ready && Config.options.wallpaperSelector.useCustomDefaultPath && Config.options.wallpaperSelector.customDefaultPath) {
+            return Qt.resolvedUrl("file://" + Config.options.wallpaperSelector.customDefaultPath);
+        }
+        return Qt.resolvedUrl(`${Directories.pictures}/Wallpapers`);
+    }
     property alias folderModel: folderModel // Expose for direct binding when needed
     property string searchQuery: ""
     readonly property list<string> extensions: [ // TODO: add videos
@@ -30,6 +35,12 @@ Singleton {
     readonly property bool thumbnailGenerationRunning: thumbgenProc.running
     property real thumbnailGenerationProgress: 0
     property var colorCache: ({})
+    property string sortField: "modified"
+    property bool sortReversed: false
+    property var creationTimes: ({})
+    property list<string> pendingCreationPaths: []
+    property alias sortedFolderModel: sortedFolderModel
+    signal sortChanged()
 
     signal changed()
     signal thumbnailGenerated(directory: string)
@@ -57,7 +68,7 @@ Singleton {
         }
     }
     
-    function openFallbackPicker(darkMode = Appearance.m3colors.darkmode) {
+    function openFallbackPicker(darkMode = Appearance.m3colors.darkmode, lockscreen = false) {
         Quickshell.execDetached([Directories.wallpaperSwitchScriptPath, "--mode", darkMode ? "dark" : "light"]);
     }
 
@@ -95,6 +106,145 @@ Singleton {
         const filePath = folderModel.get(randomIndex, "filePath");
         print("Randomly selected wallpaper:", filePath);
         root.select(filePath, darkMode);
+    }
+
+    function normalizeSortField(value) {
+        const field = String(value || "modified");
+        return ["name", "modified", "created", "size"].includes(field) ? field : "modified";
+    }
+
+    function normalizeDateValue(value) {
+        if (typeof value === "number" && isFinite(value)) {
+            return (value > 0 && value < 10000000000) ? value * 1000 : value;
+        }
+        if (value && typeof value.toMSecsSinceEpoch === "function") {
+            const milliseconds = Number(value.toMSecsSinceEpoch());
+            if (isFinite(milliseconds)) return milliseconds;
+        }
+        if (value && typeof value.getTime === "function") {
+            const milliseconds = Number(value.getTime());
+            if (isFinite(milliseconds)) return milliseconds;
+        }
+        const parsed = Date.parse(String(value || ""));
+        return isFinite(parsed) ? parsed : 0;
+    }
+
+    function sortValue(entry) {
+        switch (root.sortField) {
+        case "name":
+            return entry.fileName.toLocaleLowerCase();
+        case "created":
+            return entry.fileCreated > 0 ? entry.fileCreated : entry.fileLastModified;
+        case "size":
+            return entry.fileSize;
+        case "modified":
+        default:
+            return entry.fileLastModified;
+        }
+    }
+
+    function rebuildSortedFolderModel() {
+        const entries = [];
+        for (let i = 0; i < folderModel.count; i++) {
+            const filePath = String(folderModel.get(i, "filePath") || FileUtils.trimFileProtocol(folderModel.get(i, "fileUrl") || folderModel.get(i, "fileURL") || ""));
+            if (!filePath) continue;
+            const normalizedPath = FileUtils.trimFileProtocol(filePath);
+            const fileModifiedRaw = folderModel.get(i, "fileModified") ?? folderModel.get(i, "fileLastModified");
+            entries.push({
+                filePath: filePath,
+                fileUrl: String(folderModel.get(i, "fileUrl") || folderModel.get(i, "fileURL") || filePath),
+                fileName: String(folderModel.get(i, "fileName") || ""),
+                fileBaseName: String(folderModel.get(i, "fileBaseName") || ""),
+                fileSuffix: String(folderModel.get(i, "fileSuffix") || ""),
+                fileSize: Number(folderModel.get(i, "fileSize") || 0),
+                fileLastModified: root.normalizeDateValue(fileModifiedRaw),
+                fileCreated: Number(root.creationTimes[normalizedPath] || 0),
+                fileIsDir: Boolean(folderModel.get(i, "fileIsDir"))
+            });
+        }
+        entries.sort((left, right) => {
+            if (left.fileIsDir !== right.fileIsDir) {
+                return left.fileIsDir ? -1 : 1;
+            }
+            const leftValue = root.sortValue(left);
+            const rightValue = root.sortValue(right);
+            let comparison = 0;
+            if (typeof leftValue === "string") {
+                comparison = leftValue.localeCompare(rightValue);
+            } else {
+                if (leftValue > rightValue) comparison = -1;
+                else if (leftValue < rightValue) comparison = 1;
+            }
+            if (root.sortReversed) comparison = -comparison;
+            if (comparison === 0) {
+                comparison = left.fileName.toLocaleLowerCase().localeCompare(right.fileName.toLocaleLowerCase());
+            }
+            return comparison;
+        });
+        sortedFolderModel.clear();
+        for (let i = 0; i < entries.length; i++) {
+            sortedFolderModel.append(entries[i]);
+        }
+    }
+
+    function refreshCreationTimes() {
+        const paths = [];
+        for (let i = 0; i < folderModel.count; i++) {
+            const filePath = String(folderModel.get(i, "filePath") || "");
+            if (filePath) paths.push(FileUtils.trimFileProtocol(filePath));
+        }
+        root.pendingCreationPaths = paths;
+        if (paths.length === 0) {
+            root.creationTimes = ({});
+            root.rebuildSortedFolderModel();
+            return;
+        }
+        creationTimesProc.command = [
+            "bash", "-c",
+            "for path do stat -c '%W' -- \\"$path\\" 2>/dev/null || printf '0\\\\n'; done",
+            "wallpaper-birth-times"
+        ].concat(paths);
+        creationTimesProc.running = true;
+        root.rebuildSortedFolderModel();
+    }
+
+    function queueFolderModelRefresh() {
+        folderModelRefreshTimer.restart();
+    }
+
+    function applyNativeSort() {
+        if (root.sortField === "name") {
+            folderModel.sortField = FolderListModel.Name;
+        } else if (root.sortField === "size") {
+            folderModel.sortField = FolderListModel.Size;
+        } else {
+            folderModel.sortField = FolderListModel.Time;
+        }
+        folderModel.sortReversed = root.sortReversed;
+    }
+
+    function loadSortOptions() {
+        const options = Config.options?.wallpaperSelector;
+        root.sortField = root.normalizeSortField(options?.sortField);
+        root.sortReversed = options?.sortReversed === true;
+        root.applyNativeSort();
+        root.queueFolderModelRefresh();
+    }
+
+    function selectSortField(field) {
+        const nextField = root.normalizeSortField(field);
+        if (root.sortField === nextField) {
+            root.sortReversed = !root.sortReversed;
+        } else {
+            root.sortField = nextField;
+            root.sortReversed = false;
+        }
+        Config.options.wallpaperSelector.sortField = root.sortField;
+        Config.options.wallpaperSelector.sortReversed = root.sortReversed;
+        Config.saveOptionsNow();
+        root.applyNativeSort();
+        root.rebuildSortedFolderModel();
+        root.sortChanged();
     }
 
     Process {
@@ -151,7 +301,44 @@ Singleton {
                 const path = folderModel.get(i, "filePath") || FileUtils.trimFileProtocol(folderModel.get(i, "fileURL"))
                 if (path && path.length) root.wallpapers.push(path)
             }
+            root.queueFolderModelRefresh();
         }
+        onFolderChanged: {
+            root.queueFolderModelRefresh();
+        }
+        onStatusChanged: {
+            if (folderModel.status === FolderListModel.Ready) {
+                root.queueFolderModelRefresh();
+            }
+        }
+    }
+
+    Timer {
+        id: folderModelRefreshTimer
+        interval: 100
+        repeat: false
+        onTriggered: root.refreshCreationTimes()
+    }
+
+    Process {
+        id: creationTimesProc
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const values = text.trim().length > 0 ? text.trim().split(/\r?\n/) : [];
+                const nextCreationTimes = ({});
+                for (let i = 0; i < root.pendingCreationPaths.length; i++) {
+                    const value = Number(values[i] || 0);
+                    const ms = (isFinite(value) && value > 0) ? (value < 10000000000 ? value * 1000 : value) : 0;
+                    nextCreationTimes[root.pendingCreationPaths[i]] = ms;
+                }
+                root.creationTimes = nextCreationTimes;
+                root.rebuildSortedFolderModel();
+            }
+        }
+    }
+
+    ListModel {
+        id: sortedFolderModel
     }
 
     // Thumbnail generation
@@ -214,6 +401,14 @@ Singleton {
 
     Component.onCompleted: {
         root.loadColorCache();
+        if (Config.ready) root.loadSortOptions();
+    }
+
+    Connections {
+        target: Config
+        function onReadyChanged() {
+            if (Config.ready) root.loadSortOptions();
+        }
     }
 
     IpcHandler {
