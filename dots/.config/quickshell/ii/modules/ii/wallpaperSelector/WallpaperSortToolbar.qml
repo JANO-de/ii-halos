@@ -216,7 +216,7 @@ Toolbar {
                     implicitHeight: Appearance.sizes.barHeight - Appearance.sizes.hyprlandGapsOut * 2
                     buttonRadius: Appearance.rounding.large
                     buttonRadiusPressed: Appearance.rounding.large
-                    useDynamicRadius: true
+                    // useDynamicRadius: true (not supported by current RippleButton)
                     toggled: modelData.value === root.selectedSortField
                     colBackground: Appearance.colors.colLayer2
                     colBackgroundHover: Appearance.colors.colLayer2Hover
