@@ -8,7 +8,8 @@ import Quickshell
 
 Item {
     id: root
-    anchors.fill: parent
+    width: parent ? parent.width : 0
+    height: parent ? parent.height : 0
     visible: root.shown
 
     property bool shown: false

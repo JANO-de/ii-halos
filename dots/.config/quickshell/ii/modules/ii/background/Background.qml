@@ -529,7 +529,10 @@ Variants {
         }
 
         MouseArea {
-            anchors.fill: parent
+            width: bgRoot.width
+            height: bgRoot.height
+            x: 0
+            y: 0
             acceptedButtons: Qt.RightButton
             z: 999
             Component.onCompleted: console.log("[bg] MouseArea ready, size", width, height)
