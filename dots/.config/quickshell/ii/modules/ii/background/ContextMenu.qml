@@ -49,6 +49,7 @@ Item {
                 property string icon: ""
                 property string label: ""
                 property var onTrigger: null
+                property bool closeOnClick: true
                 Layout.fillWidth: true
                 implicitHeight: 34
                 radius: Appearance.rounding.small
@@ -80,7 +81,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         if (entry.onTrigger) entry.onTrigger();
-                        ctxRoot.activated();
+                        if (entry.closeOnClick) ctxRoot.activated();
                     }
                 }
             }
@@ -110,6 +111,7 @@ Item {
             Entry {
                 icon: ctxRoot.moreExpanded ? "expand_less" : "expand_more"
                 label: Translation.tr("More tools")
+                closeOnClick: false
                 onTrigger: () => { ctxRoot.moreExpanded = !ctxRoot.moreExpanded; }
             }
 
