@@ -533,6 +533,7 @@ Variants {
             acceptedButtons: Qt.RightButton
             z: 999
             onPressed: (mouse) => {
+                console.log("[bg] right-click", mouse.x, mouse.y, "open=", bgRoot.contextMenuOpen);
                 bgRoot.contextMenuPos = Qt.point(mouse.x, mouse.y);
                 bgRoot.contextMenuOpen = true;
                 mouse.accepted = true;

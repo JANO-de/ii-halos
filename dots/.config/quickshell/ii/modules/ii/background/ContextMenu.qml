@@ -19,6 +19,7 @@ Item {
     signal closed()
 
     function close() {
+        console.log("[ctx] close, shown was", root.shown);
         root.shown = false;
         root.moreExpanded = false;
         root.closed();
