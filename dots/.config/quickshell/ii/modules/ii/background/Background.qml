@@ -532,6 +532,7 @@ Variants {
             anchors.fill: parent
             acceptedButtons: Qt.RightButton
             z: 999
+            Component.onCompleted: console.log("[bg] MouseArea ready, size", width, height)
             onPressed: (mouse) => {
                 console.log("[bg] right-click", mouse.x, mouse.y, "open=", bgRoot.contextMenuOpen);
                 bgRoot.contextMenuPos = Qt.point(mouse.x, mouse.y);
