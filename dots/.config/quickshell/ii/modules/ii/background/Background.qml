@@ -111,6 +111,7 @@ Variants {
             left: true
             right: true
         }
+        mask: Region { item: bgInputRegion }
         color: {
             if (!bgRoot.wallpaperSafetyTriggered || bgRoot.wallpaperIsVideo)
                 return "transparent";
@@ -526,6 +527,14 @@ Variants {
             Behavior on opacity {
                 animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
             }
+        }
+
+        Rectangle {
+            id: bgInputRegion
+            width: bgRoot.screen ? bgRoot.screen.width : 1920
+            height: bgRoot.screen ? bgRoot.screen.height : 1080
+            color: "transparent"
+            opacity: 0
         }
 
         MouseArea {
