@@ -291,8 +291,8 @@ Item {
                 toggled: false
                 buttonIcon: "settings"
                 onClicked: {
-                    GlobalStates.sidebarRightOpen = false;
                     Quickshell.execDetached(["qs", "-p", root.settingsQmlPath]);
+                    Qt.callLater(() => { GlobalStates.sidebarRightOpen = false; });
                 }
                 StyledToolTip {
                     text: Translation.tr("Settings")
