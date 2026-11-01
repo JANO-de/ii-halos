@@ -529,8 +529,8 @@ Variants {
         }
 
         MouseArea {
-            width: bgRoot.width
-            height: bgRoot.height
+            width: bgRoot.screen ? bgRoot.screen.width : 1920
+            height: bgRoot.screen ? bgRoot.screen.height : 1080
             x: 0
             y: 0
             acceptedButtons: Qt.RightButton
@@ -545,6 +545,8 @@ Variants {
         }
 
         ContextMenu {
+            width: bgRoot.screen ? bgRoot.screen.width : 1920
+            height: bgRoot.screen ? bgRoot.screen.height : 1080
             shown: bgRoot.contextMenuOpen
             menuX: bgRoot.contextMenuPos.x
             menuY: bgRoot.contextMenuPos.y
