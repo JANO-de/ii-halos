@@ -4,7 +4,7 @@ pragma ComponentBehavior: Bound
 import Quickshell
 import Quickshell.Io
 import QtQuick
-import QtPositioning
+// import QtPositioning  // temporarily disabled: Qt 6.11/6.12 mismatch in environment
 
 import qs.modules.common
 
