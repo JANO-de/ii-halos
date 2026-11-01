@@ -30,7 +30,9 @@ Button {
 
     property color colBackground: ColorUtils.transparentize(Appearance?.colors.colLayer1Hover, 1) || "transparent"
     property color colBackgroundHover: Appearance?.colors.colLayer1Hover ?? "#E5DFED"
+    property color colBackgroundActive: Appearance?.colors.colLayer1Active ?? colBackgroundHover
     property color colBackgroundToggled: Appearance?.colors.colPrimary ?? "#65558F"
+    property color colBackgroundToggledActive: Appearance?.colors.colPrimaryActive ?? colBackgroundToggledHover
     property color colBackgroundToggledHover: Appearance?.colors.colPrimaryHover ?? "#77699C"
     property color colRipple: Appearance?.colors.colLayer1Active ?? "#D6CEE2"
     property color colRippleToggled: Appearance?.colors.colPrimaryActive ?? "#D6CEE2"
