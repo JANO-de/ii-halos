@@ -245,7 +245,7 @@ switch() {
             exit 0
         fi
 
-        check_and_prompt_upscale "$imgpath" &
+        # check_and_prompt_upscale "$imgpath" &  # silenced per owner request
         kill_existing_mpvpaper
 
         if is_video "$imgpath"; then
