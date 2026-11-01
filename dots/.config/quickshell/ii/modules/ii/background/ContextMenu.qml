@@ -10,28 +10,21 @@ Item {
     id: ctxRoot
     property int screenWidth: 1920
     property int screenHeight: 1080
-    width: screenWidth
-    height: screenHeight
-    visible: ctxRoot.shown
-
     property bool shown: false
     property real menuX: 0
     property real menuY: 0
     property bool moreExpanded: false
 
-    signal closed()
+    width: screenWidth
+    height: screenHeight
+    visible: shown
 
-    function close() {
-        console.log("[ctx] close, shown was", ctxRoot.shown);
-        ctxRoot.shown = false;
-        ctxRoot.moreExpanded = false;
-        ctxRoot.closed();
-    }
+    signal activated()
 
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.AllButtons
-        onPressed: ctxRoot.close()
+        onPressed: ctxRoot.activated()
     }
 
     Rectangle {
@@ -55,7 +48,7 @@ Item {
                 id: entry
                 property string icon: ""
                 property string label: ""
-                signal triggered()
+                property var onTrigger: null
                 Layout.fillWidth: true
                 implicitHeight: 34
                 radius: Appearance.rounding.small
@@ -86,8 +79,8 @@ Item {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        entry.triggered();
-                        ctxRoot.close();
+                        if (entry.onTrigger) entry.onTrigger();
+                        ctxRoot.activated();
                     }
                 }
             }
@@ -95,17 +88,17 @@ Item {
             Entry {
                 icon: "wallpaper"
                 label: Translation.tr("Wallpaper selector")
-                onTriggered: GlobalStates.wallpaperSelectorOpen = true
+                onTrigger: () => { GlobalStates.wallpaperSelectorOpen = true; }
             }
             Entry {
                 icon: "shuffle"
                 label: Translation.tr("Random wallpaper")
-                onTriggered: Wallpapers.randomFromCurrentFolder()
+                onTrigger: () => { Wallpapers.randomFromCurrentFolder(); }
             }
             Entry {
                 icon: "settings"
                 label: Translation.tr("Settings")
-                onTriggered: Quickshell.execDetached(["qs", "-p", Quickshell.shellPath("settings.qml")])
+                onTrigger: () => { Quickshell.execDetached(["qs", "-p", Quickshell.shellPath("settings.qml")]); }
             }
 
             Rectangle {
@@ -117,7 +110,7 @@ Item {
             Entry {
                 icon: ctxRoot.moreExpanded ? "expand_less" : "expand_more"
                 label: Translation.tr("More tools")
-                onTriggered: ctxRoot.moreExpanded = !ctxRoot.moreExpanded
+                onTrigger: () => { ctxRoot.moreExpanded = !ctxRoot.moreExpanded; }
             }
 
             ColumnLayout {
@@ -128,27 +121,27 @@ Item {
                 Entry {
                     icon: "terminal"
                     label: Translation.tr("Terminal")
-                    onTriggered: Quickshell.execDetached(["kitty"])
+                    onTrigger: () => { Quickshell.execDetached(["kitty"]); }
                 }
                 Entry {
                     icon: "folder"
                     label: Translation.tr("File manager")
-                    onTriggered: Quickshell.execDetached(["xdg-open", Directories.home])
+                    onTrigger: () => { Quickshell.execDetached(["xdg-open", Directories.home]); }
                 }
                 Entry {
                     icon: "screenshot_region"
                     label: Translation.tr("Screenshot")
-                    onTriggered: GlobalStates.regionSelectorOpen = true
+                    onTrigger: () => { GlobalStates.regionSelectorOpen = true; }
                 }
                 Entry {
                     icon: "overview"
                     label: Translation.tr("Overview")
-                    onTriggered: GlobalStates.overviewOpen = !GlobalStates.overviewOpen
+                    onTrigger: () => { GlobalStates.overviewOpen = !GlobalStates.overviewOpen; }
                 }
                 Entry {
                     icon: "lock"
                     label: Translation.tr("Lock screen")
-                    onTriggered: Quickshell.execDetached(["qs", "-c", "ii", "ipc", "call", "lock", "activate"])
+                    onTrigger: () => { Quickshell.execDetached(["qs", "-c", "ii", "ipc", "call", "lock", "activate"]); }
                 }
             }
         }

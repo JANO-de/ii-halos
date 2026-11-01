@@ -544,9 +544,8 @@ Variants {
             y: 0
             acceptedButtons: Qt.RightButton
             z: 999
-            Component.onCompleted: console.log("[bg] MouseArea ready, size", width, height, "screen", bgRoot.screen, "bgRoot", bgRoot.width, bgRoot.height, "parent", parent ? parent.width : "null")
+            // (debug removed)
             onPressed: (mouse) => {
-                console.log("[bg] right-click", mouse.x, mouse.y, "open=", bgRoot.contextMenuOpen);
                 bgRoot.contextMenuPos = Qt.point(mouse.x, mouse.y);
                 bgRoot.contextMenuOpen = true;
                 mouse.accepted = true;
@@ -559,7 +558,7 @@ Variants {
             shown: bgRoot.contextMenuOpen
             menuX: bgRoot.contextMenuPos.x
             menuY: bgRoot.contextMenuPos.y
-            onClosed: bgRoot.contextMenuOpen = false
+            onActivated: bgRoot.contextMenuOpen = false
         }
     }
 }
